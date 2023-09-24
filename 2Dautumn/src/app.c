@@ -4,8 +4,8 @@
 
 int main(int argc, char* argv[]) {
 	t_Player player;
-	initPlayer(&player, "res/player.png");
 	Initgame();
+	initPlayer(&player, "res/player.png");
 	while (!quit) {
 		SDL_Event e;
 		while (SDL_PollEvent(&e) != 0) {
