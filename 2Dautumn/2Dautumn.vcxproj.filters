@@ -15,7 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\player.png">
+    <Image Include="res\spring.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\player2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\ennemysprite.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\health.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -24,6 +33,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\headerfile\GAME.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\MAP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\ANIMATE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\COLLISION.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\UIELEMENTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,6 +56,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\game.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\map.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\animate.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\collision.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\uielements.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

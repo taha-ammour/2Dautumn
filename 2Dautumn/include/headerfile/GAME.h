@@ -16,4 +16,6 @@ extern SDL_Renderer* renderer;
 extern bool quit;
 
 void Initgame();
+SDL_Texture* loadTexture(const char* filename);
 float CalculateDeltaTime(Uint32* prevTime);
+float CalcDistance(SDL_Rect a, SDL_Rect b);

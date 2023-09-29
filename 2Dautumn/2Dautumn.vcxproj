@@ -19,16 +19,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\player.png" />
+    <Image Include="res\ennemysprite.png" />
+    <Image Include="res\health.png" />
+    <Image Include="res\player2.png" />
+    <Image Include="res\spring.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\headerfile\ANIMATE.h" />
+    <ClInclude Include="include\headerfile\COLLISION.h" />
     <ClInclude Include="include\headerfile\ENTITY.h" />
     <ClInclude Include="include\headerfile\GAME.h" />
+    <ClInclude Include="include\headerfile\MAP.h" />
+    <ClInclude Include="include\headerfile\UIELEMENTS.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\animate.c" />
     <ClCompile Include="src\app.c" />
+    <ClCompile Include="src\collision.c" />
     <ClCompile Include="src\entity.c" />
     <ClCompile Include="src\game.c" />
+    <ClCompile Include="src\map.c" />
+    <ClCompile Include="src\uielements.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
