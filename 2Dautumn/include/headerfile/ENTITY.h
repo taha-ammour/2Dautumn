@@ -31,7 +31,7 @@ typedef struct {
 }t_SpriteAnimation;
 
 typedef struct {
-	int hp;
+	double hp;
 	t_SpriteAnimation anim;
 	SDL_Rect rect;
 	ENTITY_STATES state;
@@ -60,7 +60,7 @@ typedef struct {
 
 typedef void (*AnimationFunction)(const t_Entity*, SDL_Rect*);
 
-void InitPlayer(t_Player* p, const char* imageFile);
+void InitPlayer(t_Player* p, const char* imageFile, int nFrames, int speedF);
 void InitEnnemy(t_Ennemy* e, const char* imageFile, int nFrames, int speedF);
 void InitCamera(t_Camera* camera);
 

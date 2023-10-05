@@ -1,29 +1,27 @@
-#include "headerfile/GAME.h"
 #include "headerfile/ENTITY.h"
 #include "headerfile/MAP.h"
 #include "headerfile/ANIMATE.h"
 #include "headerfile/COLLISION.h"
-#include <time.h>
+#include "headerfile/GAME.h"
 
 
-void InitPlayer(t_Player* p, const char* imageFile)
+void InitPlayer(t_Player* p, const char* imageFile, int nFrames, int speedF)
 {
     p->entity.hp = 100;
     p->attackdmg = 1.0f;
     p->defence = 0;
+    p->entity.anim.animated = true;
+    p->entity.anim.frames = nFrames;
+    p->entity.anim.speedframe = speedF;
     p->entity.state = IDLE;
     p->texture = loadTexture(imageFile);
     
-    if (p->texture)
+    if (!p->texture)
     {
-        SDL_QueryTexture(p->texture, NULL, NULL, &(p->entity.rect.w), &(p->entity.rect.h));
+          fprintf(stderr, "texture not loading: %s, Error: %s\n", imageFile, SDL_GetError());
     }
-    else
-    {
-        fprintf(stderr, "texture not loading: %s, Error: %s\n", imageFile, SDL_GetError());
-
-    }
-    
+    p->entity.rect.w = TILE_SIZE;
+    p->entity.rect.h = TILE_SIZE;
     p->entity.rect.x = WINDOWWIDTH /2 - p->entity.rect.w;
     p->entity.rect.y = WINDOWHEIGHT /2 - p->entity.rect.h + 48;
     
@@ -63,8 +61,8 @@ void InitCamera(t_Camera* camera) {
 
 void UpdateCameraPos(t_Player p, t_Camera* camera) {
 
-    camera->viewport.x = (p.entity.rect.x - WINDOWWIDTH / (2 * camera->Zoom)) + p.entity.rect.w;
-    camera->viewport.y = (p.entity.rect.y - WINDOWHEIGHT/ (2 * camera->Zoom)) + p.entity.rect.h;
+    camera->viewport.x =(int) (p.entity.rect.x - WINDOWWIDTH / (2 * camera->Zoom)) + p.entity.rect.w;
+    camera->viewport.y =(int) (p.entity.rect.y - WINDOWHEIGHT/ (2 * camera->Zoom)) + p.entity.rect.h;
 
     if (camera->viewport.x < 0)
         camera->viewport.x = 0;
@@ -81,24 +79,36 @@ void UpdateCameraPos(t_Player p, t_Camera* camera) {
 void UpdatePlayerPos(t_Player* p , float distance, float deltaTime) {
     const Uint8* keys = SDL_GetKeyboardState(NULL);
     float moveDistance = distance * deltaTime;
+    int moved = 0;
     if (keys[SDL_SCANCODE_W])
     {
         p->entity.rect.y -= (int)moveDistance;
+        moved = 1;
     }
     if (keys[SDL_SCANCODE_S])
     {
         p->entity.rect.y += (int)moveDistance;
+        moved = 1;
 
     }
     if (keys[SDL_SCANCODE_A])
     {
         p->entity.rect.x -= (int)moveDistance;
+        moved = 1;
 
     }
     if (keys[SDL_SCANCODE_D])
     {
         p->entity.rect.x += (int)moveDistance;
+        moved = 1;
 
+    }
+    if (!moved)
+    {
+        p->entity.state = IDLE;
+    }
+    else {
+        p->entity.state = WALK;
     }
     if (p->entity.rect.x < 16)
         p->entity.rect.x = 16;
@@ -123,21 +133,25 @@ void updateEnemyPos(t_Entity* ennemy, t_Entity* player, float speed, float delta
     else {
         ennemy->state = IDLE;
     }
-    ennemy->rect.x += velocitx * deltaTime;
-    ennemy->rect.y += velocity * deltaTime;
+    ennemy->rect.x += (int)(velocitx * deltaTime);
+    ennemy->rect.y += (int)(velocity * deltaTime);
 
 }
 
 void renderPlayer(const t_Player* p, t_Camera camera) {
+    SDL_Rect srcrect;
+    if (p->entity.anim.animated)
+    {
+        animationFunctions[p->entity.state](&(p->entity), &srcrect);
+    }
     SDL_Rect destRect = { p->entity.rect.x - camera.viewport.x, p->entity.rect.y - camera.viewport.y, p->entity.rect.w, p->entity.rect.h};
-    SDL_RenderCopy(renderer, p->texture, NULL, &destRect);
+    SDL_RenderCopy(renderer, p->texture, &srcrect, &destRect);
 }
 
 void renderEnnemy(const t_Ennemy* e, t_Camera camera) {
     SDL_Rect srcrect;
     if (e->entity.anim.animated) {
 
-       
         animationFunctions[e->entity.state](&(e->entity), &srcrect);
     }
     SDL_Rect destRect = { e->entity.rect.x - camera.viewport.x, e->entity.rect.y - camera.viewport.y, e->entity.rect.w, e->entity.rect.h };

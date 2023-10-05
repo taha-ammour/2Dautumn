@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define WINDOWWIDTH 1024
 #define WINDOWHEIGHT 600

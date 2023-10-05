@@ -18,13 +18,22 @@
     <Image Include="res\spring.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\player2.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="res\ennemysprite.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\health.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\inv.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\player.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\rock.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\items.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
@@ -45,6 +54,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\headerfile\UIELEMENTS.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\ITEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -70,5 +82,11 @@
     <ClCompile Include="src\uielements.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\item.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="res\arial.ttf" />
   </ItemGroup>
 </Project>

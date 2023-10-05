@@ -21,7 +21,10 @@
   <ItemGroup>
     <Image Include="res\ennemysprite.png" />
     <Image Include="res\health.png" />
-    <Image Include="res\player2.png" />
+    <Image Include="res\inv.png" />
+    <Image Include="res\items.png" />
+    <Image Include="res\player.png" />
+    <Image Include="res\rock.png" />
     <Image Include="res\spring.png" />
   </ItemGroup>
   <ItemGroup>
@@ -29,6 +32,7 @@
     <ClInclude Include="include\headerfile\COLLISION.h" />
     <ClInclude Include="include\headerfile\ENTITY.h" />
     <ClInclude Include="include\headerfile\GAME.h" />
+    <ClInclude Include="include\headerfile\ITEM.h" />
     <ClInclude Include="include\headerfile\MAP.h" />
     <ClInclude Include="include\headerfile\UIELEMENTS.h" />
   </ItemGroup>
@@ -38,8 +42,12 @@
     <ClCompile Include="src\collision.c" />
     <ClCompile Include="src\entity.c" />
     <ClCompile Include="src\game.c" />
+    <ClCompile Include="src\item.c" />
     <ClCompile Include="src\map.c" />
     <ClCompile Include="src\uielements.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="res\arial.ttf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

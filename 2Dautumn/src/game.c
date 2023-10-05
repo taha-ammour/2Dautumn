@@ -61,5 +61,5 @@ float CalculateDeltaTime(Uint32* prevTime) {
 
 float CalcDistance(SDL_Rect a, SDL_Rect b)
 {
-	return sqrtf((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
+	return sqrtf((float)((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)));
 }
