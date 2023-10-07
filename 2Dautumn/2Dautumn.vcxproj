@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <Image Include="res\attack.png" />
     <Image Include="res\ennemysprite.png" />
     <Image Include="res\health.png" />
     <Image Include="res\inv.png" />
@@ -47,7 +48,7 @@
     <ClCompile Include="src\uielements.c" />
   </ItemGroup>
   <ItemGroup>
-    <Font Include="res\arial.ttf" />
+    <Font Include="fonts\arial.ttf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

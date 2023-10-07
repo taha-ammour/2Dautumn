@@ -122,15 +122,24 @@ void UpdatePlayerPos(t_Player* p , float distance, float deltaTime) {
 
 void updateEnemyPos(t_Entity* ennemy, t_Entity* player, float speed, float deltaTime)
 {
+    SDL_Rect objectpos = {BASEPOINT_X*16, BASEPOINT_Y*16, 16, 16};
     float distance = CalcDistance(player->rect, ennemy->rect);
+    float distanceOBJ = CalcDistance(objectpos, ennemy->rect);
     float velocitx = 0, velocity = 0;
+    
     if (distance < CHASE_DISTANCE)
     {
         velocitx = (player->rect.x - ennemy->rect.x) / distance * speed;
         velocity = (player->rect.y - ennemy->rect.y) / distance * speed;
         ennemy->state = WALK;
     }
-    else {
+    else if(distanceOBJ > CHASE_DISTANCE){
+        velocitx = (objectpos.x - ennemy->rect.x) / distanceOBJ * speed;
+        velocity = (objectpos.y - ennemy->rect.y) / distanceOBJ * speed;
+        ennemy->state = WALK;
+    }
+    else
+    {
         ennemy->state = IDLE;
     }
     ennemy->rect.x += (int)(velocitx * deltaTime);

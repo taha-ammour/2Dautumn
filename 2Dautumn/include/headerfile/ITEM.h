@@ -39,7 +39,6 @@ typedef struct {
     SDL_Rect rect;
     ITEM_TEX TEX;
     ITEM_TYPE TYPE;
-    t_Popup pop;
     int itemCount;
 }t_item;
 

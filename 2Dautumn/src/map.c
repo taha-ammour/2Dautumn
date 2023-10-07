@@ -8,7 +8,7 @@ void ResetRock(RespawnInfo* respawnInfo)
     t_Map* map = respawnInfo->map;
     int x = respawnInfo->x;
     int y = respawnInfo->y;
-    if (map->objectMap[y][x].TYPE != NONE)
+    if (map->objectMap[y][x].TYPE == NONE_OBJECT)
     {
         map->objectMap[y][x].entity.hp = 10;
         map->objectMap[y][x].LIFE = FULL;

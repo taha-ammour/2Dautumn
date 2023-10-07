@@ -36,6 +36,9 @@
     <Image Include="res\items.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\attack.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\headerfile\ENTITY.h">
@@ -87,6 +90,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="res\arial.ttf" />
+    <Font Include="fonts\arial.ttf" />
   </ItemGroup>
 </Project>

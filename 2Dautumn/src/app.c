@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 	InitEnnemy(ennemy, "res/ennemysprite.png", 3, 200);
 	InitPlayer(player, "res/player.png", 3 , 200);
 	InitHealth( "res/health.png", &player->entity, &health);
-	InitInventory("res/inv.png","res/items.png","res/arial.ttf", playerInventory);
+	InitInventory("res/inv.png","res/items.png","fonts/arial.ttf", playerInventory);
 	while (!quit) {
 
 		deltaTime = CalculateDeltaTime(&prevTime);

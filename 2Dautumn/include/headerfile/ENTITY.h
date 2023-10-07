@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define BASEPOINT_X 400
-#define BASEPOINT_Y 300
+#define BASEPOINT_X (MAP_WIDTH/2)
+#define BASEPOINT_Y (MAP_HEIGHT / 2)
 #define PLAYER_RADIUS 30
 #define ENEMY_RADIUS 20
 #define CHASE_DISTANCE 100
@@ -43,6 +43,12 @@ typedef struct {
 	int defence;
 	SDL_Texture* texture;
 }t_Player;
+
+typedef struct {
+	t_Entity entity;
+	SDL_Rect rect;
+	double velocityX, velocityY;
+}t_Projectile;
 
 typedef struct {
 	t_Entity entity;
