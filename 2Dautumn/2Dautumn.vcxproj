@@ -36,6 +36,11 @@
     <ClInclude Include="include\headerfile\ITEM.h" />
     <ClInclude Include="include\headerfile\MAP.h" />
     <ClInclude Include="include\headerfile\UIELEMENTS.h" />
+    <ClInclude Include="include\headerfile\COMBAT.h" />
+    <ClInclude Include="include\headerfile\CRAFT.h" />
+    <ClInclude Include="include\headerfile\PARTICLE.h" />
+    <ClInclude Include="include\headerfile\SOUND.h" />
+    <ClInclude Include="include\headerfile\WORLD.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\animate.c" />
@@ -46,6 +51,11 @@
     <ClCompile Include="src\item.c" />
     <ClCompile Include="src\map.c" />
     <ClCompile Include="src\uielements.c" />
+    <ClCompile Include="src\combat.c" />
+    <ClCompile Include="src\craft.c" />
+    <ClCompile Include="src\particle.c" />
+    <ClCompile Include="src\sound.c" />
+    <ClCompile Include="src\world.c" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\arial.ttf" />
@@ -103,10 +113,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\include\headerfile;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\fonts;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\src;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\res;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\headerfile;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\include\headerfile;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\fonts;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\src;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\res;D:\Users\moham\OneDrive\Documents\game\2Dautumn\2Dautumn\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)include\headerfile;$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

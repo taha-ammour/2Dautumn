@@ -2,7 +2,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <sdl2/SDL_mixer.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -14,6 +14,8 @@
 #define NUMBER_TILE_ROW 7
 #define MAP_WIDTH (WINDOWWIDTH / TILE_SIZE)
 #define MAP_HEIGHT (WINDOWHEIGHT / TILE_SIZE)
+#define TREE_RESPAWN_TIME 30000
+#define SEED_CLEARING 2
 
 typedef enum {
 	BORDER_TILE_START = 0,
@@ -35,6 +37,7 @@ typedef struct {
 	OBJECT_TYPE TYPE;
 	STATE LIFE;
 	t_Entity entity;
+	Uint32 respawnAt; // 0 when nothing has to grow back here
 } t_Object;
 
 typedef struct {
@@ -46,23 +49,16 @@ typedef struct {
 
 }t_Map;
 
-typedef struct {
-	int x;
-	int y;
-	t_Map* map;
-} RespawnInfo;
-
-
-void ResetRock(RespawnInfo* respawnInfo);
-
-Uint32 RespawnRockCallback(Uint32 interval, void* param);
+void RespawnTree(t_Map* map, int x, int y);
 
 void generateTerrain(t_Map* map);
-void generateOBJ(t_Map* map, const char* filepathobj);
+void generateOBJ(t_Map* map);
 
 void InitTerrain(t_Map* map, const char* filepath, const char* filepathobj);
+t_Object* GetSeed(t_Map* map);
+void ScreenToWorld(int screenX, int screenY, t_Camera camera, int* worldX, int* worldY);
 
-void InteractPOBJ(SDL_Event* e,t_Map* map, t_Player* player,t_inventory* inv, t_Camera camera);
+bool InteractPOBJ(SDL_Event* e,t_Map* map, t_Player* player,t_inventory* inv, t_Camera camera);
 void UpdateOBJState(t_Map* map, t_inventory* inv);
 
 void renderTilemap(t_Map* map, t_Camera camera);

@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
-#include <sdl2/SDL_mixer.h>
+#include <SDL2/SDL_mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -48,3 +48,8 @@ typedef struct {
 } t_inv_slot;
 
 t_item generateItemOnDestroy(ITEM_TEX itemTex, ITEM_TYPE itemtype);
+t_item makeItem(ITEM_TEX itemTex, ITEM_TYPE itemtype, int count);
+
+const char* GetItemName(ITEM_TEX itemTex);
+double GetWeaponDamage(ITEM_TEX itemTex);
+double GetMiningMultiplier(ITEM_TEX itemTex);

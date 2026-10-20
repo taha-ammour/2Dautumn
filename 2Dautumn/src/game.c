@@ -63,3 +63,30 @@ float CalcDistance(SDL_Rect a, SDL_Rect b)
 {
 	return sqrtf((float)((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)));
 }
+
+float RandomFloat(float min, float max)
+{
+	return min + (max - min) * ((float)rand() / (float)RAND_MAX);
+}
+
+int LoadBestScore(const char* filename)
+{
+	char buffer[16] = { 0 };
+	SDL_RWops* file = SDL_RWFromFile(filename, "r");
+	if (file == NULL)
+		return 0;
+	SDL_RWread(file, buffer, 1, sizeof(buffer) - 1);
+	SDL_RWclose(file);
+	return SDL_atoi(buffer);
+}
+
+void SaveBestScore(const char* filename, int score)
+{
+	char buffer[16];
+	SDL_RWops* file = SDL_RWFromFile(filename, "w");
+	if (file == NULL)
+		return;
+	int length = SDL_snprintf(buffer, sizeof(buffer), "%d\n", score);
+	SDL_RWwrite(file, buffer, 1, length);
+	SDL_RWclose(file);
+}

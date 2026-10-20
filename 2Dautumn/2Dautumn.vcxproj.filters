@@ -59,6 +59,21 @@
     <ClInclude Include="include\headerfile\UIELEMENTS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\headerfile\COMBAT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\CRAFT.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\PARTICLE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\SOUND.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\headerfile\WORLD.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="include\headerfile\ITEM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -83,6 +98,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\uielements.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\combat.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\craft.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\particle.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sound.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\world.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\item.c">
