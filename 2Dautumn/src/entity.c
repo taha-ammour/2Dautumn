@@ -1,9 +1,7 @@
 #include "headerfile/ENTITY.h"
 #include "headerfile/MAP.h"
 #include "headerfile/ANIMATE.h"
-#include "headerfile/COLLISION.h"
 #include "headerfile/GAME.h"
-#include "headerfile/COMBAT.h"
 
 static float screenShake = 0.0f;
 
@@ -17,10 +15,10 @@ typedef struct {
 }t_EnemyStats;
 
 static const t_EnemyStats enemyStats[LEAF_KIND_COUNT] = {
-    /* LEAF_ORANGE  */ { 25, 5, 1, 52, 1, { 255, 255, 255, 255 } },
-    /* LEAF_RED     */ { 16, 4, 0, 85, 1, { 255, 120, 110, 255 } },
-    /* LEAF_GOLD    */ { 30, 7, 1, 44, 2, { 255, 235, 90, 255 } },
-    /* LEAF_CRIMSON */ { 60, 10, 3, 32, 3, { 220, 90, 200, 255 } },
+    /* LEAF_ORANGE  */ { 20, 5, 0, 40, 2, { 214, 110, 30, 255 } },
+    /* LEAF_RED     */ { 26, 7, 1, 55, 2, { 200, 50, 40, 255 } },
+    /* LEAF_GOLD    */ { 22, 5, 0, 45, 3, { 240, 200, 50, 255 } },
+    /* LEAF_CRIMSON */ { 40, 9, 2, 35, 3, { 190, 60, 150, 255 } },
 };
 
 
@@ -48,10 +46,10 @@ void InitPlayer(t_Player* p, const char* imageFile, int nFrames, int speedF)
     {
           fprintf(stderr, "texture not loading: %s, Error: %s\n", imageFile, SDL_GetError());
     }
-    ResetPlayer(p);
+    ResetPlayer(p, 0, 0);
 }
 
-void ResetPlayer(t_Player* p)
+void ResetPlayer(t_Player* p, float x, float y)
 {
     p->entity.hp = PLAYER_MAX_HP;
     p->attackdmg = 1.0f;
@@ -60,12 +58,14 @@ void ResetPlayer(t_Player* p)
     p->entity.hurtTime = 0;
     p->attackTime = 0;
     p->flip = false;
+    p->faceX = 0;
+    p->faceY = 1;
     p->alive = true;
     p->respawnTimer = 0;
 
     p->entity.rect.w = TILE_SIZE;
     p->entity.rect.h = TILE_SIZE;
-    SetEntityPos(&p->entity, (float)(BASEPOINT_X * TILE_SIZE), (float)(BASEPOINT_Y * TILE_SIZE + 32));
+    SetEntityPos(&p->entity, x, y);
 }
 
 void InitEnnemy(t_Ennemy* e, SDL_Texture* texture, ENEMY_KIND kind, float x, float y)
@@ -86,8 +86,15 @@ void InitEnnemy(t_Ennemy* e, SDL_Texture* texture, ENEMY_KIND kind, float x, flo
     e->defence = stats->defence;
     e->speed = stats->speed * RandomFloat(0.9f, 1.1f);
     e->attackCooldown = 0;
-    e->flip = false;
+    e->flip = rand() % 2;
     e->entity.hurtTime = 0;
+    e->mood = MOOD_IDLE;
+    e->moodTimer = RandomFloat(0.5f, 2.5f);
+    e->homeX = x;
+    e->homeY = y;
+    e->targetX = x;
+    e->targetY = y;
+    e->respawnTimer = 0;
 
     e->entity.state = IDLE;
     e->texture = texture;
@@ -108,6 +115,8 @@ void InitCamera(t_Camera* camera) {
     camera->viewport.y = 0;
     camera->viewport.w = (int)SDL_ceilf(WINDOWWIDTH / camera->Zoom);
     camera->viewport.h = (int)SDL_ceilf(WINDOWHEIGHT / camera->Zoom);
+    camera->x = 0;
+    camera->y = 0;
 }
 
 void AddScreenShake(float amount)
@@ -117,21 +126,30 @@ void AddScreenShake(float amount)
         screenShake = 6.0f;
 }
 
+static void cameraTarget(t_Player p, t_Camera* camera, float* x, float* y)
+{
+    float maxX = (float)(MAP_WIDTH * TILE_SIZE - camera->viewport.w);
+    float maxY = (float)(MAP_HEIGHT * TILE_SIZE - camera->viewport.h);
+    *x = SDL_clamp(p.entity.posX + 8 - camera->viewport.w / 2.0f, 0.0f, maxX);
+    *y = SDL_clamp(p.entity.posY + 8 - camera->viewport.h / 2.0f, 0.0f, maxY);
+}
+
+void SnapCamera(t_Player p, t_Camera* camera)
+{
+    cameraTarget(p, camera, &camera->x, &camera->y);
+    camera->viewport.x = (int)camera->x;
+    camera->viewport.y = (int)camera->y;
+}
+
 void UpdateCameraPos(t_Player p, t_Camera* camera, float deltaTime) {
-    int maxX = MAP_WIDTH * TILE_SIZE - camera->viewport.w;
-    int maxY = MAP_HEIGHT * TILE_SIZE - camera->viewport.h;
+    float targetX, targetY;
 
-    camera->viewport.x = p.entity.rect.x + p.entity.rect.w / 2 - camera->viewport.w / 2;
-    camera->viewport.y = p.entity.rect.y + p.entity.rect.h / 2 - camera->viewport.h / 2;
-
-    if (camera->viewport.x < 0)
-        camera->viewport.x = 0;
-    if (camera->viewport.y < 0)
-        camera->viewport.y = 0;
-    if (camera->viewport.x > maxX)
-        camera->viewport.x = maxX;
-    if (camera->viewport.y > maxY)
-        camera->viewport.y = maxY;
+    // ease towards the player instead of locking onto every step
+    cameraTarget(p, camera, &targetX, &targetY);
+    camera->x += (targetX - camera->x) * SDL_min(1.0f, deltaTime * 7.0f);
+    camera->y += (targetY - camera->y) * SDL_min(1.0f, deltaTime * 7.0f);
+    camera->viewport.x = (int)SDL_floorf(camera->x + 0.5f);
+    camera->viewport.y = (int)SDL_floorf(camera->y + 0.5f);
 
     if (screenShake > 0.0f)
     {
@@ -143,107 +161,6 @@ void UpdateCameraPos(t_Player p, t_Camera* camera, float deltaTime) {
     }
 
     SDL_RenderSetScale(renderer, camera->Zoom, camera->Zoom);
-}
-
-void UpdatePlayerPos(t_Player* p , float distance, float deltaTime) {
-    const Uint8* keys = SDL_GetKeyboardState(NULL);
-    float dirX = 0, dirY = 0;
-
-    if (keys[SDL_SCANCODE_W] || keys[SDL_SCANCODE_UP])
-        dirY -= 1;
-    if (keys[SDL_SCANCODE_S] || keys[SDL_SCANCODE_DOWN])
-        dirY += 1;
-    if (keys[SDL_SCANCODE_A] || keys[SDL_SCANCODE_LEFT])
-        dirX -= 1;
-    if (keys[SDL_SCANCODE_D] || keys[SDL_SCANCODE_RIGHT])
-        dirX += 1;
-
-    // same speed when walking diagonally
-    if (dirX != 0 && dirY != 0)
-    {
-        dirX *= 0.7071f;
-        dirY *= 0.7071f;
-    }
-    p->entity.posX += dirX * distance * deltaTime;
-    p->entity.posY += dirY * distance * deltaTime;
-
-    if (dirX < 0)
-        p->flip = true;
-    else if (dirX > 0)
-        p->flip = false;
-
-    if (SDL_GetTicks() - p->attackTime < ATTACK_ANIM_TIME)
-    {
-        p->entity.state = ATTACK;
-    }
-    else if (dirX == 0 && dirY == 0)
-    {
-        p->entity.state = IDLE;
-    }
-    else {
-        p->entity.state = WALK;
-    }
-    if (p->entity.posX < 16)
-        p->entity.posX = 16;
-    if (p->entity.posX > MAP_WIDTH * 16 - 32)
-        p->entity.posX = MAP_WIDTH * 16 - 32;
-    if (p->entity.posY < 16)
-        p->entity.posY = 16;
-    if (p->entity.posY > MAP_HEIGHT * 16 - 32)
-        p->entity.posY = MAP_HEIGHT * 16 - 32;
-    SyncEntityRect(&p->entity);
-}
-
-void updateEnemyPos(t_Ennemy* ennemy, t_Entity* player, SDL_Rect target, float windX, float windY, float speedScale, float deltaTime)
-{
-    t_Entity* e = &ennemy->entity;
-    float distance = player != NULL ? CalcDistance(player->rect, e->rect) : 1e9f;
-    float distanceOBJ = CalcDistance(target, e->rect);
-    float velocitx = 0, velocity = 0;
-    float speed = ennemy->speed * speedScale;
-    // red leaves are drawn to the player, crimson ones only care about the seed
-    float chaseDistance = ennemy->kind == LEAF_RED ? CHASE_DISTANCE * 1.4f :
-        ennemy->kind == LEAF_CRIMSON ? 0.0f : (float)CHASE_DISTANCE;
-
-    if (distance < chaseDistance && distance > 1.0f)
-    {
-        velocitx = (player->rect.x - e->rect.x) / distance * speed;
-        velocity = (player->rect.y - e->rect.y) / distance * speed;
-        e->state = WALK;
-    }
-    else if(distanceOBJ > SEED_ATTACK_RANGE){
-        velocitx = (target.x - e->rect.x) / distanceOBJ * speed;
-        velocity = (target.y - e->rect.y) / distanceOBJ * speed;
-        e->state = WALK;
-    }
-    else
-    {
-        e->state = ATTACK;
-    }
-
-    // leaves are light, the wind carries them along
-    if (e->state == WALK)
-    {
-        velocitx += windX * 0.5f;
-        velocity += windY * 0.5f;
-    }
-    if (velocitx < 0)
-        ennemy->flip = true;
-    else if (velocitx > 0)
-        ennemy->flip = false;
-
-    e->posX += velocitx * deltaTime;
-    e->posY += velocity * deltaTime;
-
-    if (e->posX < 0)
-        e->posX = 0;
-    if (e->posX > MAP_WIDTH * TILE_SIZE - TILE_SIZE)
-        e->posX = (float)(MAP_WIDTH * TILE_SIZE - TILE_SIZE);
-    if (e->posY < 0)
-        e->posY = 0;
-    if (e->posY > MAP_HEIGHT * TILE_SIZE - TILE_SIZE)
-        e->posY = (float)(MAP_HEIGHT * TILE_SIZE - TILE_SIZE);
-    SyncEntityRect(e);
 }
 
 static bool isFlashing(const t_Entity* e, Uint32 duration)
@@ -269,14 +186,12 @@ void renderPlayer(const t_Player* p, t_Camera camera) {
 
 void renderEnnemy(const t_Ennemy* e, t_Camera camera) {
     SDL_Rect srcrect = { 0, 0, TILE_SIZE, TILE_SIZE };
-    SDL_Color tint = GetEnemyTint(e->kind);
-    if (e->entity.anim.animated) {
+    // they only use their walk cycle and idle rows, the third row holds other colors
+    ENTITY_STATES row = e->entity.state == IDLE ? IDLE : WALK;
+    animationFunctions[row](&(e->entity), &srcrect);
 
-        animationFunctions[e->entity.state](&(e->entity), &srcrect);
-    }
     SDL_Rect destRect = { e->entity.rect.x - camera.viewport.x, e->entity.rect.y - camera.viewport.y, e->entity.rect.w, e->entity.rect.h };
     SDL_RendererFlip flip = e->flip ? SDL_FLIP_HORIZONTAL : SDL_FLIP_NONE;
-    SDL_SetTextureColorMod(e->texture, tint.r, tint.g, tint.b);
     SDL_RenderCopyEx(renderer, e->texture, &srcrect, &destRect, 0, NULL, flip);
     if (isFlashing(&e->entity, 240))
     {
@@ -285,14 +200,22 @@ void renderEnnemy(const t_Ennemy* e, t_Camera camera) {
         SDL_RenderCopyEx(renderer, e->texture, &srcrect, &destRect, 0, NULL, flip);
         SDL_SetTextureBlendMode(e->texture, SDL_BLENDMODE_BLEND);
     }
-    SDL_SetTextureColorMod(e->texture, 255, 255, 255);
 
-    // small health bar once the leaf is damaged
+    // an angry leaf shows it, and its health once it has been hurt
+    if (e->mood == MOOD_ANGRY)
+    {
+        SDL_Rect mark = { destRect.x + 7, destRect.y - 7, 2, 4 };
+        SDL_Rect dot = { destRect.x + 7, destRect.y - 2, 2, 1 };
+        SDL_SetRenderDrawColor(renderer, 255, 80, 60, 255);
+        SDL_RenderFillRect(renderer, &mark);
+        SDL_RenderFillRect(renderer, &dot);
+    }
     if (e->entity.hp < e->maxHp)
     {
-        SDL_Rect back = { destRect.x + 2, destRect.y - 3, 12, 2 };
+        SDL_Rect back = { destRect.x + 2, destRect.y - 1, 12, 2 };
         SDL_Rect front = back;
         front.w = (int)(12 * (e->entity.hp / e->maxHp));
+        SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(renderer, 40, 10, 15, 220);
         SDL_RenderFillRect(renderer, &back);
         SDL_SetRenderDrawColor(renderer, 240, 120, 40, 255);

@@ -4,66 +4,54 @@
 #include <stdbool.h>
 #include "headerfile/ENTITY.h"
 #include "headerfile/MAP.h"
-#include "headerfile/COMBAT.h"
+#include "headerfile/UIELEMENTS.h"
 
-#define DAY_LENGTH 70.0f
-#define FIRST_DAY_LENGTH 90.0f
-#define DUSK_LENGTH 6.0f
-#define DAWN_LENGTH 5.0f
-#define NIGHT_MIN_LENGTH 20.0f
-#define SEED_BASE_HP 100.0
-#define SEED_HP_PER_LEVEL 20.0
-#define SEED_FEED_RANGE 40.0f
-#define SEED_MAX_FUEL 60.0f
-#define WIND_MAX 35.0f
+#define DAY_LENGTH 120.0f
+#define SEASON_DAYS 10
+#define SNOW_FROM_DAY 8
+#define WIND_MAX 30.0f
+#define PLANT_RANGE 22.0f
 
+// the steps towards planting the heart seed, the first unmet one is shown
 typedef enum {
-	PHASE_DAY,
-	PHASE_DUSK,
-	PHASE_NIGHT,
-	PHASE_DAWN,
-}WORLD_PHASE;
+	QUEST_PICK,
+	QUEST_HILLS,
+	QUEST_STONE_PICK,
+	QUEST_BRIDGE,
+	QUEST_MOSS,
+	QUEST_COMPOST,
+	QUEST_GLADE,
+	QUEST_PLANT,
+	QUEST_DONE,
+}QUEST_STEP;
 
 typedef struct {
-	WORLD_PHASE phase;
-	float phaseTimer;
-	float phaseLength;
+	float time; // seconds since the season started
 	int day;
-	int nightsSurvived;
+	bool visited[REGION_COUNT];
+	REGION currentRegion;
+	bool winter;
+	bool finished;
+	int finishDay;
+	QUEST_STEP quest;
 
 	float windX, windY;
 	float windTargetX, windTargetY;
 	float windTimer;
 
-	int toSpawn;
-	int enemiesLeft;
-	float spawnTimer;
-	float daySpawnTimer;
-
-	int seedLevel;
-	double seedMaxHp;
-	float seedFuel;
-
-	SDL_Texture* lightTex;
-	SDL_Texture* lightMap;
-	int lightMapW, lightMapH;
-
-	char banner[64];
+	char banner[48];
+	char bannerSub[96];
 	float bannerTimer;
 }t_World;
 
-void InitWorld(t_World* world, t_Camera* camera);
 void ResetWorld(t_World* world, t_Map* map);
-void ShowBanner(t_World* world, const char* text);
+void ShowBanner(t_World* world, const char* title, const char* subtitle);
 
 void UpdateWind(t_World* world, float deltaTime);
-void UpdateWorld(t_World* world, t_Map* map, t_EnemyPool* enemies, t_Player* player, float deltaTime);
-void UpdatePlayerLife(t_World* world, t_Map* map, t_Player* player, float deltaTime);
+void UpdateWorld(t_World* world, t_Map* map, t_Player* player, t_inventory* inv, float deltaTime);
+bool TryPlantSeed(t_World* world, t_Map* map, t_Player* player, t_inventory* inv);
+float GetSnowAmount(const t_World* world);
 
-float GetSeedLightRadius(const t_World* world);
-float GetSeedBurnDps(const t_World* world);
-bool FeedSeed(t_World* world, t_Map* map, t_Player* player, t_inventory* inv);
-
-void renderSeedAura(const t_World* world, t_Map* map, t_Camera camera);
-void renderLighting(t_World* world, t_Map* map, t_Player* player, t_ProjectilePool* shots, t_Camera camera);
-void renderWorldHud(const t_World* world, t_Map* map, const t_Player* player);
+void renderSeasonTint(const t_World* world, t_Camera camera);
+bool renderSignBubble(t_Map* map, const t_Player* player, t_Camera camera);
+void renderWorldHud(const t_World* world, t_Map* map, const t_Player* player, t_Camera camera, bool hideBanner);

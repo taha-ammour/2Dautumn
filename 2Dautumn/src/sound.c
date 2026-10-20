@@ -13,13 +13,15 @@ typedef struct {
 static const t_SfxShape sfxShapes[SFX_COUNT] = {
 	/* SFX_HIT       */ { 320, 120, 0.10f, 0.35f, 0.5f, true },
 	/* SFX_HARVEST   */ { 700, 500, 0.06f, 0.25f, 0.3f, true },
-	/* SFX_EMBER     */ { 900, 200, 0.22f, 0.25f, 0.7f, false },
+	/* SFX_CLINK     */ { 1400, 1300, 0.08f, 0.20f, 0.1f, true },
+	/* SFX_PICKUP    */ { 880, 1320, 0.07f, 0.18f, 0.0f, true },
 	/* SFX_HURT      */ { 200, 70, 0.25f, 0.40f, 0.3f, true },
 	/* SFX_ENEMY_DIE */ { 500, 80, 0.30f, 0.30f, 0.8f, false },
 	/* SFX_CRAFT     */ { 520, 1040, 0.15f, 0.25f, 0.0f, true },
-	/* SFX_FEED      */ { 300, 600, 0.30f, 0.25f, 0.4f, false },
-	/* SFX_NIGHT     */ { 110, 55, 1.20f, 0.35f, 0.1f, false },
-	/* SFX_DAWN      */ { 440, 880, 0.80f, 0.30f, 0.0f, false },
+	/* SFX_BRIDGE    */ { 180, 140, 0.18f, 0.35f, 0.6f, true },
+	/* SFX_DISCOVER  */ { 440, 880, 0.70f, 0.25f, 0.0f, false },
+	/* SFX_PLANT     */ { 330, 990, 1.40f, 0.30f, 0.0f, false },
+	/* SFX_SWING     */ { 600, 250, 0.09f, 0.12f, 0.9f, false },
 };
 
 static Mix_Chunk* chunks[SFX_COUNT];

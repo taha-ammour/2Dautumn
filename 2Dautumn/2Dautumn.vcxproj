@@ -27,6 +27,8 @@
     <Image Include="res\player.png" />
     <Image Include="res\rock.png" />
     <Image Include="res\spring.png" />
+    <Image Include="res\objects.png" />
+    <Image Include="res\terrain.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\headerfile\ANIMATE.h" />
@@ -59,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\arial.ttf" />
+    <Font Include="fonts\PixelifySans.ttf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

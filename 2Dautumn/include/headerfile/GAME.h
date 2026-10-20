@@ -17,7 +17,7 @@ typedef enum {
 	SCREEN_TITLE,
 	SCREEN_PLAYING,
 	SCREEN_PAUSED,
-	SCREEN_GAMEOVER,
+	SCREEN_ENDING,
 }GAME_SCREEN;
 
 extern SDL_Window* window;

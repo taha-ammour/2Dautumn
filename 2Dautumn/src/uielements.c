@@ -1,34 +1,68 @@
 #include "headerfile/UIELEMENTS.h"
 
 TTF_Font* uiFont = NULL;
+TTF_Font* uiFontSmall = NULL;
 TTF_Font* uiFontBig = NULL;
 
 void InitUIFonts(const char* fontpath)
 {
-	uiFont = TTF_OpenFont(fontpath, 8);
-	uiFontBig = TTF_OpenFont(fontpath, 16);
-	if (uiFont == NULL || uiFontBig == NULL)
+	uiFont = TTF_OpenFont(fontpath, 24);
+	uiFontSmall = TTF_OpenFont(fontpath, 18);
+	uiFontBig = TTF_OpenFont(fontpath, 56);
+	if (uiFont == NULL || uiFontSmall == NULL || uiFontBig == NULL)
 	{
 		fprintf(stderr, "Font not loading: %s, Error: %s\n", fontpath, TTF_GetError());
 	}
 }
 
+static void drawSurface(SDL_Surface* surface, int x, int y)
+{
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_Rect rect = { x, y, surface->w, surface->h };
+	SDL_RenderCopy(renderer, texture, NULL, &rect);
+	SDL_DestroyTexture(texture);
+}
+
+// x and y are in world-scaled (logical) units, the glyphs are drawn at screen resolution
 void renderText(TTF_Font* font, const char* text, int x, int y, SDL_Color color, TEXT_ALIGN align)
 {
+	SDL_Color shadow = { 30, 14, 16, 255 };
+	float scaleX, scaleY;
+
 	if (font == NULL || text == NULL || text[0] == '\0')
 		return;
-	SDL_Surface* surface = TTF_RenderText_Solid(font, text, color);
-	if (surface == NULL)
+	SDL_Surface* surface = TTF_RenderUTF8_Solid(font, text, color);
+	SDL_Surface* shadowSurface = TTF_RenderUTF8_Solid(font, text, shadow);
+	if (surface == NULL || shadowSurface == NULL)
+	{
+		SDL_FreeSurface(surface);
+		SDL_FreeSurface(shadowSurface);
 		return;
-	SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, surface);
-	SDL_Rect textrect = { x, y, surface->w, surface->h };
+	}
+	SDL_RenderGetScale(renderer, &scaleX, &scaleY);
+	int px = (int)(x * scaleX);
+	int py = (int)(y * scaleY);
 	if (align == ALIGN_CENTER)
-		textrect.x -= surface->w / 2;
+		px -= surface->w / 2;
 	else if (align == ALIGN_RIGHT)
-		textrect.x -= surface->w;
+		px -= surface->w;
+
+	SDL_RenderSetScale(renderer, 1.0f, 1.0f);
+	drawSurface(shadowSurface, px + 2, py + 2);
+	drawSurface(surface, px, py);
+	SDL_RenderSetScale(renderer, scaleX, scaleY);
 	SDL_FreeSurface(surface);
-	SDL_RenderCopy(renderer, textTexture, NULL, &textrect);
-	SDL_DestroyTexture(textTexture);
+	SDL_FreeSurface(shadowSurface);
+}
+
+int TextWidth(TTF_Font* font, const char* text)
+{
+	int w = 0, h = 0;
+	float scaleX, scaleY;
+	if (font == NULL || TTF_SizeUTF8(font, text, &w, &h) != 0)
+		return 0;
+	SDL_RenderGetScale(renderer, &scaleX, &scaleY);
+	return (int)(w / scaleX);
 }
 
 void renderPanel(SDL_Rect rect, Uint8 alpha)
@@ -58,7 +92,7 @@ void InitInventory(const char* filename, const char* filenameitemtex, const char
 
 void ClearInventory(t_inventory* inventory)
 {
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < INV_SLOTS; i++) {
 		inventory->slots[i].selected = i == 0;
 		inventory->slots[i].item.itemCount = 0;
 		inventory->slots[i].item.TYPE = NONE;
@@ -94,7 +128,7 @@ void InitHealth(const char* filename, t_Entity* numHearts, t_Uihealth** health)
 
 bool addItemToInventory(t_inventory* inventory, t_item newItem)
 {
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < INV_SLOTS; i++) {
 		if (inventory->slots[i].item.TEX == newItem.TEX) {
 			inventory->slots[i].item.itemCount += newItem.itemCount;
 			
@@ -102,7 +136,7 @@ bool addItemToInventory(t_inventory* inventory, t_item newItem)
 		}
 	}
 
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < INV_SLOTS; i++) {
 		if (inventory->slots[i].item.TEX == NONE_TEX) {
 			inventory->slots[i].item = newItem;
 			return true; 
@@ -114,7 +148,7 @@ bool addItemToInventory(t_inventory* inventory, t_item newItem)
 int CountItem(const t_inventory* inventory, ITEM_TEX itemTex)
 {
 	int count = 0;
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < INV_SLOTS; i++) {
 		if (inventory->slots[i].item.TEX == itemTex) {
 			count += inventory->slots[i].item.itemCount;
 		}
@@ -126,7 +160,7 @@ bool RemoveItem(t_inventory* inventory, ITEM_TEX itemTex, int count)
 {
 	if (CountItem(inventory, itemTex) < count)
 		return false;
-	for (int i = 0; i < 7 && count > 0; i++) {
+	for (int i = 0; i < INV_SLOTS && count > 0; i++) {
 		t_item* item = &inventory->slots[i].item;
 		if (item->TEX != itemTex)
 			continue;
@@ -145,7 +179,7 @@ bool RemoveItem(t_inventory* inventory, ITEM_TEX itemTex, int count)
 
 ITEM_TEX GetSelectedItem(const t_inventory* inventory)
 {
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < INV_SLOTS; i++) {
 		if (inventory->slots[i].selected) {
 			return inventory->slots[i].item.TEX;
 		}
@@ -165,23 +199,26 @@ void updateInventorySelection(SDL_Event* event, t_inventory* inventory)
 {
 	if (event->type == SDL_MOUSEWHEEL && event->wheel.y != 0) {
 		int current = 0;
-		for (int i = 0; i < 7; i++) {
+		for (int i = 0; i < INV_SLOTS; i++) {
 			if (inventory->slots[i].selected)
 				current = i;
 			inventory->slots[i].selected = false;
 		}
-		current = (current + (event->wheel.y > 0 ? 6 : 1)) % 7;
+		current = (current + (event->wheel.y > 0 ? INV_SLOTS - 1 : 1)) % INV_SLOTS;
 		inventory->slots[current].selected = true;
 	}
 	if (event->type == SDL_KEYDOWN) {
-		if (event->key.keysym.sym >= SDLK_1 && event->key.keysym.sym <= SDLK_7) {
-			int slotIndex = event->key.keysym.sym - SDLK_1;
-			if (slotIndex >= 0 && slotIndex < 7) {
-				for (int i = 0; i < 7; i++) {
-					inventory->slots[i].selected = false;
-				}
-				inventory->slots[slotIndex].selected = true;
+		SDL_Keycode key = event->key.keysym.sym;
+		int slotIndex = -1;
+		if (key >= SDLK_1 && key <= SDLK_9)
+			slotIndex = key - SDLK_1;
+		else if (key == SDLK_0)
+			slotIndex = 9;
+		if (slotIndex >= 0 && slotIndex < INV_SLOTS) {
+			for (int i = 0; i < INV_SLOTS; i++) {
+				inventory->slots[i].selected = false;
 			}
+			inventory->slots[slotIndex].selected = true;
 		}
 	}
 
@@ -213,38 +250,32 @@ void updateHeartStates(t_Uihealth* healths, t_Entity entity)
 	}
 }
 
-void renderInv(t_inventory* inv)
+void renderInv(t_inventory* inv, int screenW, int screenH)
 {
 	int invsize = 16;
-	int invspace = 14;
-	for (int i = 0; i < 7; i++)
+	int step = 18;
+	int startX = (screenW - INV_SLOTS * step) / 2;
+	int y = screenH - invsize - 5;
+	char text[8];
+
+	for (int i = 0; i < INV_SLOTS; i++)
 	{
-		SDL_Rect srcrect = {inv->slots[i].selected * invsize, 0, invsize,invsize };
-		
-		SDL_Rect destrect = { (int)((int64_t)WINDOWWIDTH / 9 - 3 + i * ((int64_t)invsize + invspace) * 0.5),(int)(WINDOWHEIGHT/4 + invsize * 1.5 ), (int)(invsize ),(int)(invsize)};
+		SDL_Rect srcrect = { inv->slots[i].selected * invsize, 0, invsize, invsize };
+		SDL_Rect destrect = { startX + i * step, y, invsize, invsize };
 		SDL_RenderCopy(renderer, inv->tex, &srcrect, &destrect);
 		if (inv->slots[i].item.TYPE != NONE) {
-			SDL_Rect srcrect1 = { inv->slots[i].item.TEX * invsize, 0, invsize, invsize};
-			SDL_Rect destrect1 = { (int)((int64_t)WINDOWWIDTH / 9 - 3 + i * ((int64_t)invsize + invspace) * 0.5),(int)(WINDOWHEIGHT / 4 + invsize * 1.5), (int)(invsize),(int)(invsize) };
-			SDL_RenderCopy(renderer, inv->itemTexture, &srcrect1, &destrect1);
-
-			char text[5];
-			snprintf(text, sizeof(text), "%d", inv->slots[i].item.itemCount);
-			SDL_Surface* surface = TTF_RenderText_Solid(inv->font, text, inv->textColor);
-			SDL_Texture* textTexture = SDL_CreateTextureFromSurface(renderer, surface);
-			
-			SDL_Rect textrect = { destrect1.x + 8,destrect1.y + 8,surface->w, surface->h };
-			SDL_FreeSurface(surface);
-			SDL_RenderCopy(renderer, textTexture, NULL, &textrect);
-			SDL_DestroyTexture(textTexture);
+			renderItemIcon(inv, inv->slots[i].item.TEX, destrect);
+			if (inv->slots[i].item.itemCount > 1) {
+				snprintf(text, sizeof(text), "%d", inv->slots[i].item.itemCount);
+				renderText(uiFontSmall, text, destrect.x + invsize - 1, destrect.y + invsize - 8, inv->textColor, ALIGN_RIGHT);
+			}
 		}
 	}
 	// name of the item in hand, just above the hotbar
 	ITEM_TEX selected = GetSelectedItem(inv);
 	if (selected != NONE_TEX)
 	{
-		int barCenter = (int)(WINDOWWIDTH / 9 - 3 + 3 * (invsize + invspace) * 0.5) + invsize / 2;
-		renderText(inv->font, GetItemName(selected), barCenter, (int)(WINDOWHEIGHT / 4 + invsize * 1.5) - 11, inv->textColor, ALIGN_CENTER);
+		renderText(uiFontSmall, GetItemName(selected), screenW / 2, y - 9, inv->textColor, ALIGN_CENTER);
 	}
 }
 

@@ -26,6 +26,10 @@ typedef enum {
     WOOD_SWORD_TEX,
     STONE_PICK_TEX,
     STONE_SWORD_TEX,
+    PLANK_TEX,
+    LEAVES_TEX,
+    MOSS_TEX,
+    COMPOST_TEX,
 }ITEM_TEX;
 
 typedef struct {
@@ -51,5 +55,7 @@ t_item generateItemOnDestroy(ITEM_TEX itemTex, ITEM_TYPE itemtype);
 t_item makeItem(ITEM_TEX itemTex, ITEM_TYPE itemtype, int count);
 
 const char* GetItemName(ITEM_TEX itemTex);
+ITEM_TYPE GetItemType(ITEM_TEX itemTex);
 double GetWeaponDamage(ITEM_TEX itemTex);
 double GetMiningMultiplier(ITEM_TEX itemTex);
+int GetPickTier(ITEM_TEX itemTex);

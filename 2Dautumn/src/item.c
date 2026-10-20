@@ -30,7 +30,24 @@ const char* GetItemName(ITEM_TEX itemTex)
 	case WOOD_SWORD_TEX: return "Wood Sword";
 	case STONE_PICK_TEX: return "Stone Pick";
 	case STONE_SWORD_TEX: return "Stone Sword";
+	case PLANK_TEX: return "Plank";
+	case LEAVES_TEX: return "Leaves";
+	case MOSS_TEX: return "Moss";
+	case COMPOST_TEX: return "Compost";
 	default: return "";
+	}
+}
+
+ITEM_TYPE GetItemType(ITEM_TEX itemTex)
+{
+	switch (itemTex)
+	{
+	case WOOD_PICK_TEX:
+	case STONE_PICK_TEX: return MINE;
+	case WOOD_SWORD_TEX:
+	case STONE_SWORD_TEX: return ITEMATT;
+	case NONE_TEX: return NONE;
+	default: return MATERIAL;
 	}
 }
 
@@ -47,15 +64,25 @@ double GetWeaponDamage(ITEM_TEX itemTex)
 	}
 }
 
-// how much faster rocks and trees break with the selected item in hand
+// how hard the selected item hits trees, rocks and the rest
 double GetMiningMultiplier(ITEM_TEX itemTex)
 {
 	switch (itemTex)
 	{
-	case WOOD_PICK_TEX: return 2.5;
-	case STONE_PICK_TEX: return 4.0;
+	case WOOD_PICK_TEX: return 2.0;
+	case STONE_PICK_TEX: return 3.5;
 	case WOOD_SWORD_TEX:
 	case STONE_SWORD_TEX: return 1.5;
 	default: return 1.0;
 	}
+}
+
+// 0 = no pickaxe, 1 = wood, 2 = stone: some rocks need a stronger pick
+int GetPickTier(ITEM_TEX itemTex)
+{
+	if (itemTex == STONE_PICK_TEX)
+		return 2;
+	if (itemTex == WOOD_PICK_TEX)
+		return 1;
+	return 0;
 }

@@ -18,6 +18,8 @@ typedef enum {
 	EMPTY
 }STATE;
 
+#define INV_SLOTS 10
+
 typedef struct {
 	SDL_Rect rect;
 	SDL_Texture* tex;
@@ -28,7 +30,7 @@ typedef struct {
 
 
 typedef struct {
-	t_inv_slot slots[7];
+	t_inv_slot slots[INV_SLOTS];
 	SDL_Texture* tex;
 	SDL_Texture* itemTexture;
 	TTF_Font* font;
@@ -41,11 +43,14 @@ typedef enum {
 	ALIGN_RIGHT,
 }TEXT_ALIGN;
 
+// fonts are sized in screen pixels, text is drawn unscaled so it stays crisp
 extern TTF_Font* uiFont;
+extern TTF_Font* uiFontSmall;
 extern TTF_Font* uiFontBig;
 
 void InitUIFonts(const char* fontpath);
 void renderText(TTF_Font* font, const char* text, int x, int y, SDL_Color color, TEXT_ALIGN align);
+int TextWidth(TTF_Font* font, const char* text);
 void renderPanel(SDL_Rect rect, Uint8 alpha);
 
 void InitInventory(const char* filename, const char* filenameitemtex,const char* fontpath, t_inventory* inventory);
@@ -61,5 +66,5 @@ void renderItemIcon(const t_inventory* inv, ITEM_TEX itemTex, SDL_Rect dest);
 void updateInventorySelection(SDL_Event* event, t_inventory* inventory);
 void updateHeartStates(t_Uihealth* healths, t_Entity entity);
 
-void renderInv(t_inventory* inv);
+void renderInv(t_inventory* inv, int screenW, int screenH);
 void renderhealth(t_Player p, t_Uihealth* health);

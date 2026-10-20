@@ -5,7 +5,7 @@
 #include "headerfile/ITEM.h"
 #include "headerfile/UIELEMENTS.h"
 
-#define RECIPE_COUNT 5
+#define RECIPE_COUNT 7
 
 typedef struct {
 	ITEM_TEX result;

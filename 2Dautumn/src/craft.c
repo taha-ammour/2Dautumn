@@ -3,22 +3,25 @@
 
 #define ROW_HEIGHT 18
 
+// stone tools are upgrades: they use up the wooden one
 static const t_Recipe recipes[RECIPE_COUNT] = {
 	{ STICK_TEX, MATERIAL, 2, WOOD_TEX, 1, NONE_TEX, 0 },
-	{ WOOD_SWORD_TEX, ITEMATT, 1, WOOD_TEX, 2, STICK_TEX, 1 },
+	{ PLANK_TEX, MATERIAL, 2, WOOD_TEX, 1, NONE_TEX, 0 },
 	{ WOOD_PICK_TEX, MINE, 1, WOOD_TEX, 2, STICK_TEX, 2 },
-	{ STONE_SWORD_TEX, ITEMATT, 1, STONE_TEX, 3, STICK_TEX, 1 },
-	{ STONE_PICK_TEX, MINE, 1, STONE_TEX, 3, STICK_TEX, 2 },
+	{ WOOD_SWORD_TEX, ITEMATT, 1, WOOD_TEX, 2, STICK_TEX, 1 },
+	{ STONE_PICK_TEX, MINE, 1, WOOD_PICK_TEX, 1, STONE_TEX, 3 },
+	{ STONE_SWORD_TEX, ITEMATT, 1, WOOD_SWORD_TEX, 1, STONE_TEX, 3 },
+	{ COMPOST_TEX, MATERIAL, 1, LEAVES_TEX, 4, MOSS_TEX, 1 },
 };
 
 void InitCraftMenu(t_CraftMenu* menu, int screenW, int screenH)
 {
 	menu->open = false;
 	menu->hovered = -1;
-	menu->rect.w = 150;
+	menu->rect.w = 170;
 	menu->rect.h = 20 + RECIPE_COUNT * ROW_HEIGHT;
 	menu->rect.x = (screenW - menu->rect.w) / 2;
-	menu->rect.y = (screenH - menu->rect.h) / 2 - 15;
+	menu->rect.y = (screenH - menu->rect.h) / 2 - 10;
 }
 
 bool CanCraft(const t_inventory* inv, const t_Recipe* recipe)
@@ -40,9 +43,9 @@ bool Craft(t_inventory* inv, const t_Recipe* recipe)
 	if (!addItemToInventory(inv, makeItem(recipe->result, recipe->type, recipe->amount)))
 	{
 		// no free slot: give the materials back
-		addItemToInventory(inv, makeItem(recipe->cost1, MATERIAL, recipe->count1));
+		addItemToInventory(inv, makeItem(recipe->cost1, GetItemType(recipe->cost1), recipe->count1));
 		if (recipe->cost2 != NONE_TEX)
-			addItemToInventory(inv, makeItem(recipe->cost2, MATERIAL, recipe->count2));
+			addItemToInventory(inv, makeItem(recipe->cost2, GetItemType(recipe->cost2), recipe->count2));
 		return false;
 	}
 	return true;
@@ -87,7 +90,7 @@ static void renderCost(const t_inventory* inv, ITEM_TEX itemTex, int count, int 
 
 	renderItemIcon(inv, itemTex, icon);
 	snprintf(text, sizeof(text), "%d", count);
-	renderText(uiFont, text, x + 12, y + 2, color, ALIGN_LEFT);
+	renderText(uiFontSmall, text, x + 12, y + 2, color, ALIGN_LEFT);
 }
 
 void renderCraftMenu(const t_CraftMenu* menu, const t_inventory* inv)
@@ -97,7 +100,7 @@ void renderCraftMenu(const t_CraftMenu* menu, const t_inventory* inv)
 	if (!menu->open)
 		return;
 	renderPanel(menu->rect, 225);
-	renderText(uiFont, "Crafting  (C to close)", menu->rect.x + menu->rect.w / 2, menu->rect.y + 4, title, ALIGN_CENTER);
+	renderText(uiFontSmall, "Crafting  -  click to craft, C to close", menu->rect.x + menu->rect.w / 2, menu->rect.y + 4, title, ALIGN_CENTER);
 
 	for (int i = 0; i < RECIPE_COUNT; i++)
 	{
@@ -117,7 +120,7 @@ void renderCraftMenu(const t_CraftMenu* menu, const t_inventory* inv)
 			snprintf(name, sizeof(name), "%s x%d", GetItemName(recipe->result), recipe->amount);
 		else
 			snprintf(name, sizeof(name), "%s", GetItemName(recipe->result));
-		renderText(uiFont, name, row.x + 20, row.y + 4, craftable ? title : (SDL_Color){ 150, 130, 110, 255 }, ALIGN_LEFT);
+		renderText(uiFontSmall, name, row.x + 20, row.y + 4, craftable ? title : (SDL_Color){ 150, 130, 110, 255 }, ALIGN_LEFT);
 
 		renderCost(inv, recipe->cost1, recipe->count1, row.x + row.w - 50, row.y + 2, CountItem(inv, recipe->cost1) >= recipe->count1);
 		if (recipe->cost2 != NONE_TEX)

@@ -8,20 +8,14 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define BASEPOINT_X (MAP_WIDTH/2)
-#define BASEPOINT_Y (MAP_HEIGHT / 2)
-#define PLAYER_RADIUS 30
-#define ENEMY_RADIUS 20
-#define CHASE_DISTANCE 100
-
 #define PLAYER_MAX_HP 100
-#define PLAYER_SPEED 110.0f
+#define PLAYER_SPEED 95.0f
 #define PLAYER_IFRAMES 900
-#define PLAYER_RESPAWN_TIME 4.0f
+#define PLAYER_REGEN_DELAY 5000
+#define PLAYER_REGEN_RATE 4.0
 #define ATTACK_ANIM_TIME 250
 
 #define MAX_ENEMIES 64
-#define MAX_PROJECTILES 32
 
 
 extern SDL_Window* window;
@@ -41,6 +35,14 @@ typedef enum {
 	LEAF_CRIMSON,
 	LEAF_KIND_COUNT,
 }ENEMY_KIND;
+
+// leaf spirits are peaceful until someone hits them
+typedef enum {
+	MOOD_IDLE,
+	MOOD_WANDER,
+	MOOD_ANGRY,
+	MOOD_FLEE,
+}ENEMY_MOOD;
 
 typedef struct {
 	bool animated;
@@ -64,16 +66,10 @@ typedef struct {
 	SDL_Texture* texture;
 	Uint32 attackTime;
 	bool flip;
+	float faceX, faceY; // last walking direction, used by the keyboard swing
 	bool alive;
 	float respawnTimer;
 }t_Player;
-
-typedef struct {
-	t_Entity entity;
-	double velocityX, velocityY;
-	bool active;
-	float life;
-}t_Projectile;
 
 typedef struct {
 	t_Entity entity;
@@ -88,11 +84,17 @@ typedef struct {
 	float speed;
 	float attackCooldown;
 	bool flip;
+	ENEMY_MOOD mood;
+	float moodTimer;
+	float homeX, homeY;
+	float targetX, targetY;
+	float respawnTimer;
 }t_Ennemy;
 
 typedef struct {
 	float Zoom;
 	SDL_Rect viewport;
+	float x, y; // smoothed position of the top-left corner
 }t_Camera;
 
 typedef void (*AnimationFunction)(const t_Entity*, SDL_Rect*);
@@ -101,14 +103,13 @@ void SetEntityPos(t_Entity* e, float x, float y);
 void SyncEntityRect(t_Entity* e);
 
 void InitPlayer(t_Player* p, const char* imageFile, int nFrames, int speedF);
-void ResetPlayer(t_Player* p);
+void ResetPlayer(t_Player* p, float x, float y);
 void InitEnnemy(t_Ennemy* e, SDL_Texture* texture, ENEMY_KIND kind, float x, float y);
 void InitCamera(t_Camera* camera);
 
 void AddScreenShake(float amount);
+void SnapCamera(t_Player p, t_Camera* camera);
 void UpdateCameraPos(t_Player p, t_Camera* camera, float deltaTime);
-void UpdatePlayerPos(t_Player* p,float distance, float deltaTime);
-void updateEnemyPos(t_Ennemy* ennemy, t_Entity* player, SDL_Rect target, float windX, float windY, float speedScale, float deltaTime);
 
 SDL_Color GetEnemyTint(ENEMY_KIND kind);
 

@@ -39,6 +39,12 @@
     <Image Include="res\attack.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\objects.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\terrain.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\headerfile\ENTITY.h">
