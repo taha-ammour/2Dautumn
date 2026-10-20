@@ -55,7 +55,7 @@ void separateEntities(t_Entity* entity1, t_Entity* entity2)
         dy = (float)(rand() % 3 - 1);
         distSq = dx * dx + dy * dy + 0.01f;
     }
-    float dist = sqrtf(distSq);
+    float dist = SDL_sqrtf(distSq);
     float push = (minDist - dist) * 0.5f;
     entity1->posX += dx / dist * push;
     entity1->posY += dy / dist * push;
